@@ -24,3 +24,7 @@ class SQLAlchemyBudgetRepository(BudgetRepository):
             raise Exception
 
         return result
+
+    async def delete_budget(self, budget_id: BudgetId) -> None:
+        budget = await self.get_by_id(budget_id)
+        budget.active = False

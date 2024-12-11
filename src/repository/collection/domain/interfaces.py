@@ -12,3 +12,6 @@ class BudgetRepository(Protocol):
 
     async def get_by_id(self, budget_id: BudgetId) -> Budget:
         ...
+
+    async def delete_budget(self, budget_id: BudgetId) -> None:
+        ...

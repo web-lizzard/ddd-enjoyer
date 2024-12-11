@@ -13,7 +13,7 @@ def repository_factory(session: AsyncSession) -> BudgetRepository:
 DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 # Create async engine and session
-engine = create_async_engine(DATABASE_URL, echo=False, future=True)
+engine = create_async_engine(DATABASE_URL, echo=True, future=True)
 
 # Create a session factory
 AsyncSessionLocal = async_sessionmaker(
@@ -61,11 +61,21 @@ async def main() -> None:
 
         change_budget(budget)
 
+        await session.commit()
+
         changed_budget = await find_budget(repository, budget.id)
 
         print(changed_budget.total_amount)
 
         assert changed_budget.total_amount == _CHANGED_INITIAL_AMOUNT
+
+        await repository.delete_budget(id)
+
+        removed_budget = await repository.get_by_id(id)
+
+        await session.commit()
+
+        print(removed_budget.active)
 
 
 if __name__ == "__main__":
