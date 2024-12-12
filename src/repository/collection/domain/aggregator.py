@@ -2,15 +2,20 @@ from dataclasses import dataclass, field
 from uuid import uuid4
 
 
+@dataclass
+class DomainId:
+    value: str = field(default_factory=lambda: str(uuid4()))
+
+
 ## Value Object
 @dataclass
-class BudgetId:
-    value: str = field(default_factory=lambda: str(uuid4()))
+class BudgetId(DomainId):
+    pass
 
 
 @dataclass
-class ExpenseId:
-    value: str = field(default_factory=lambda: str(uuid4()))
+class ExpenseId(DomainId):
+    pass
 
 
 ## Aggregates

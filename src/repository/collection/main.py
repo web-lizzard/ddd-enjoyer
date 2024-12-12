@@ -1,8 +1,15 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from .application.commands.commands import CreateBudget
+from .application.commands.handlers import CreateBudgetHandler
 from .domain.aggregator import Budget, BudgetId
 from .domain.interfaces import BudgetRepository
-from .infrastructure.persistence import SQLAlchemyBudgetRepository, map_tables, metadata
+from .infrastructure.persistence import (
+    SQLAlchemyBudgetRepository,
+    map_tables,
+    metadata,
+)
+from .infrastructure.persistence.uow import SQLAlchemyUnitOfWork
 
 
 def repository_factory(session: AsyncSession) -> BudgetRepository:
@@ -53,29 +60,30 @@ async def main() -> None:
     async with AsyncSessionLocal() as session:
         map_tables()
         repository = repository_factory(session)
-        id = await create_budget(repository)
+        uow = SQLAlchemyUnitOfWork(session=session)
+        handler = CreateBudgetHandler(uow=uow, repository=repository)
 
-        await session.commit()  ## Transaction
+        command = CreateBudget(amount=20000)
 
-        budget = await find_budget(repository, id)
+        await handler.handle(command)
 
-        change_budget(budget)
+        # change_budget(budget)
 
-        await session.commit()
+        # await session.commit()
 
-        changed_budget = await find_budget(repository, budget.id)
+        # changed_budget = await find_budget(repository, budget.id)
 
-        print(changed_budget.total_amount)
+        # print(changed_budget.total_amount)
 
-        assert changed_budget.total_amount == _CHANGED_INITIAL_AMOUNT
+        # assert changed_budget.total_amount == _CHANGED_INITIAL_AMOUNT
 
-        await repository.delete_budget(id)
+        # await repository.delete_budget(id)
 
-        removed_budget = await repository.get_by_id(id)
+        # removed_budget = await repository.get_by_id(id)
 
-        await session.commit()
+        # await session.commit()
 
-        print(removed_budget.active)
+        # print(removed_budget.active)
 
 
 if __name__ == "__main__":

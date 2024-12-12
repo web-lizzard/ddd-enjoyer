@@ -1,4 +1,4 @@
-from .mapper import map_tables, metadata
+from .mapper import budgets_table, map_tables, metadata
 from .repository import SQLAlchemyBudgetRepository
 
-__all__ = ["map_tables", "metadata", "SQLAlchemyBudgetRepository"]
+__all__ = ["map_tables", "metadata", "SQLAlchemyBudgetRepository", "budgets_table"]
